@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,7 +22,7 @@ import android.widget.RelativeLayout;
 public class MainActivity extends Activity {
 	int windowwidth;
 	int screenCenter;
-	int x_cord, y_cord, x, y;
+	int x_cord, y_cord, x, y, dx, dy;
 	int Likes = 0;
 	RelativeLayout parentView;
 	float alphaValue = 0;
@@ -38,44 +39,29 @@ public class MainActivity extends Activity {
 
 		parentView = (RelativeLayout) findViewById(R.id.layoutview);
 		windowwidth = getWindowManager().getDefaultDisplay().getWidth();
+		//Log.d("myApp", Float.toString(windowwidth));
 		screenCenter = windowwidth / 2;
-		int[] myImageList = new int[] { R.drawable.cats, R.drawable.baby1, R.drawable.sachin,
-				R.drawable.cats, R.drawable.puppy };
+		//int[] myImageList = new int[] { R.drawable.cats, R.drawable.baby1, R.drawable.sachin,
+		//		R.drawable.cats, R.drawable.puppy };
+		int [] myImageList = new int[] { R.drawable.cats, R.drawable.baby1, R.drawable.sachin};
 
-		for (int i = 0; i < 5; i++) {
-			LayoutInflater inflate = (LayoutInflater) m_context
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		
+		for (int i = 0; i < 3; i++) {
+			LayoutInflater inflate = (LayoutInflater) m_context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 			final View m_view = inflate.inflate(R.layout.custom_layout, null);
+			//final View m_view = inflate.inflate(R.layout.fragment_main, null);
 			ImageView m_image = (ImageView) m_view.findViewById(R.id.sp_image);
 			LinearLayout m_topLayout = (LinearLayout) m_view.findViewById(R.id.sp_color);
 			LinearLayout m_bottomLayout = (LinearLayout) m_view.findViewById(R.id.sp_linh);
 			// final RelativeLayout myRelView = new RelativeLayout(this);
-			m_view.setLayoutParams(new LayoutParams((windowwidth - 80), 450));
+			m_view.setLayoutParams(new LayoutParams((windowwidth - 80), windowwidth));
 			m_view.setX(40);
 			m_view.setY(40);
 			m_view.setTag(i);
 			m_image.setBackgroundResource(myImageList[i]);
-
-			if (i == 0) {
-				m_view.setRotation(-1);
-			} else if (i == 1) {
-				m_view.setRotation(-5);
-
-			} else if (i == 2) {
-				m_view.setRotation(3);
-
-			} else if (i == 3) {
-				m_view.setRotation(7);
-
-			} else if (i == 4) {
-				m_view.setRotation(-2);
-
-			} else if (i == 5) {
-				m_view.setRotation(5);
-
-			}
-
+			
+			
 			// ADD dynamically like button on image.
 			final Button imageLike = new Button(m_context);
 			imageLike.setLayoutParams(new LayoutParams(100, 50));
@@ -114,8 +100,6 @@ public class MainActivity extends Activity {
 					x_cord = (int) event.getRawX();
 					y_cord = (int) event.getRawY();
 
-					m_view.setX(x_cord - screenCenter + 40);
-					m_view.setY(y_cord - 150);
 					switch (event.getAction()) {
 					case MotionEvent.ACTION_DOWN:
 						x = (int) event.getX();
@@ -123,17 +107,15 @@ public class MainActivity extends Activity {
 						Log.v("On touch", x + " " + y);
 						break;
 					case MotionEvent.ACTION_MOVE:
-						x_cord = (int) event.getRawX(); // Updated for more
-														// smoother animation.
+						x_cord = (int) event.getRawX(); // Updated for more smoother animation.
 						y_cord = (int) event.getRawY();
-						m_view.setX(x_cord - x);
-						m_view.setY(y_cord - y);
-						// m_view.setY(y_cord-y);﻿
-						// y_cord = (int) event.getRawY();
-						// m_view.setX(x_cord - screenCenter + 40);
-						// m_view.setY(y_cord - 150);
-						if (x_cord >= screenCenter) {
+						dx = x_cord - x;
+						dy = y_cord - y;
+						m_view.setX(dx);
+						m_view.setY(dy - 80);
+						if (dx >= 5) {
 							m_view.setRotation((float) ((x_cord - screenCenter) * (Math.PI / 32)));
+							//like image fade
 							if (x_cord > (screenCenter + (screenCenter / 2))) {
 								imageLike.setAlpha(1);
 								if (x_cord > (windowwidth - (screenCenter / 4))) {
@@ -146,9 +128,9 @@ public class MainActivity extends Activity {
 								imageLike.setAlpha(0);
 							}
 							imagePass.setAlpha(0);
-						} else {
-							// rotate
+						} else if ((dx < -5)){
 							m_view.setRotation((float) ((x_cord - screenCenter) * (Math.PI / 32)));
+							//pass image fade
 							if (x_cord < (screenCenter / 2)) {
 								imagePass.setAlpha(1);
 								if (x_cord < screenCenter / 4) {
@@ -162,11 +144,12 @@ public class MainActivity extends Activity {
 							}
 							imageLike.setAlpha(0);
 						}
+						else{};
 
 						break;
 					case MotionEvent.ACTION_UP:
-						x_cord = (int) event.getRawX();
-						y_cord = (int) event.getRawY();
+						//x_cord = (int) event.getRawX();
+						//y_cord = (int) event.getRawY();
 
 						Log.e("X Point", "" + x_cord + " , Y " + y_cord);
 						imagePass.setAlpha(0);
@@ -180,6 +163,7 @@ public class MainActivity extends Activity {
 						} else if (Likes == 1) {
 							// Log.e("Event Status", "Passed");
 							parentView.removeView(m_view);
+
 						} else if (Likes == 2) {
 
 							// Log.e("Event Status", "Liked");
@@ -195,6 +179,10 @@ public class MainActivity extends Activity {
 
 			parentView.addView(m_view);
 
+		
 		}
+		
 	}
+	
+
 }
